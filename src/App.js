@@ -1,16 +1,18 @@
-import React, { Suspense,useState } from 'react'
+import React, { Suspense,useState,useContext } from 'react'
 import {Canvas} from '@react-three/fiber' 
 import {OrbitControls} from '@react-three/drei' 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import SignLanguage from './SignLanguage'
-import { useSpring, animated, config } from '@react-spring/three'
 import './style.css'
+import {Context} from './Context'
 
 function App({name}) {
   const [input,setInput] = useState('')
   const [action,setAction] = useState('стоя')
 
   const [message, setMessage] = useState('')
+  const actions = useContext(Context)
+
   const commands = [
     {
       command: 'а',
@@ -233,9 +235,6 @@ function App({name}) {
     }
   }
 
-  
-
-
   return (
   <>
       <div>
@@ -262,7 +261,7 @@ function App({name}) {
         <pointLight intensity={2} position={[1,1,3]} color='blue'/>
         <pointLight intensity={2} position={[0,3,-10]} color='white'/>
         <Suspense fallback={null}>
-          <animated.SignLanguage action={action} transcript={transcript}/>
+          <SignLanguage action={action} transcript={transcript}/>
         </Suspense>
         <OrbitControls/>
     </Canvas>
