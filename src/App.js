@@ -8,23 +8,18 @@ import {Context} from './Context'
 
 function App({name}) {
   const [input,setInput] = useState('')
-  const [action,setAction] = useState('стоя')
+  const [action,setAction] = useState('')
 
-  const [message, setMessage] = useState('')
-  const actions = useContext(Context)
+  const [message, setMessage] = useState('стоя')
 
   const commands = [
-    {
-      command: 'а',
-      callback: () => setMessage(() => {
-        setAction('А')
-      })
-    },
+    // {
+    //   command: 'а',
+    //   callback: () => setAction('А')
+    // },
     {
       command: 'б',
-      callback: () => setMessage(() => {
-        setAction('Б')
-      })
+      callback: () => setAction('Б')
     },
     {
       command: 'в',
@@ -40,9 +35,7 @@ function App({name}) {
     },
     {
       command: 'д',
-      callback: () => setMessage(() => {
-        setAction('Д')
-      })
+      callback: () => setAction('Д')
     },
     {
       command: 'е',
@@ -223,18 +216,6 @@ function App({name}) {
     }
   }
 
-  const showAnimationSpeech = () => {
-    if(transcript === 'б') {
-      setAction('Б')
-    }
-    if(transcript === 'а') {
-      setAction('А')
-    }
-    if(transcript === 'в') {
-      setAction('В')
-    }
-  }
-
   return (
   <>
       <div>
@@ -243,7 +224,6 @@ function App({name}) {
         <button onClick={SpeechRecognition.stopListening}>Stop</button>
         <button onClick={resetTranscript}>Reset</button>
         <p className='try'>{transcript}</p>
-        <button onClick={showAnimationSpeech}>Show Animation When Speaking</button>
       </div>  
 
     <div className="controls">
@@ -261,7 +241,7 @@ function App({name}) {
         <pointLight intensity={2} position={[1,1,3]} color='blue'/>
         <pointLight intensity={2} position={[0,3,-10]} color='white'/>
         <Suspense fallback={null}>
-          <SignLanguage action={action} transcript={transcript}/>
+          <SignLanguage action={action} transcript={transcript} setAction={setAction}/>
         </Suspense>
         <OrbitControls/>
     </Canvas>

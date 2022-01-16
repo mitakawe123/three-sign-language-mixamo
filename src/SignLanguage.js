@@ -1,35 +1,47 @@
-import React, { useRef,useEffect } from 'react'
+import React, { useRef,useEffect,useState } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { LoopOnce } from 'three';
 import { Context } from './Context';
 
 export default function Model({ ...props }) {
   
-  const {action} = props
-  const {transcript} = props
+  const {transcript,setAction,action} = props
   const group = useRef()
   const { nodes, materials, animations } = useGLTF('/signLanguage.glb')
   const { actions } = useAnimations(animations, group)
-  const previousAction = usePrevious(action)
+  let previousAction = usePrevious(action)
   let array = transcript.split(" ")
   array = array.map(x => {return x.toUpperCase()})
+  let activeAction
+  let prevAction
+
   useEffect(() => {
+
+    //trqbva da se napravi sas setAction trqbva da sravnq s loop kogato choveka kaje neshto da promenq setAction directno za da promenq samiq action 
 
     const mainActions = Object.keys(actions)
       for (let i = 0; i < array.length; i++) {
-
-      if(array[i].length > 1) {
+        if(array[i].length > 1) {
+        
         let word = array[i].split('')
-        console.log(array);
           for (let t = 0; t < word.length; t++) {
+
               if(previousAction) {
-                actions[previousAction]
-                  .fadeOut(1)
-                  .stop()
+                // actions[previousAction]
+                  // .fadeOut(1)
+                  // .stop()
+                  actions[previousAction].fadeOut(1)
               }
-              actions[word[t]]
-              .play()
-              .setLoop(LoopOnce)              
+              // actions[word[t]]
+              // .play()
+              // .setLoop(LoopOnce)      
+            actions[word[t]]
+              .setEffectiveTimeScale( 1 )
+              .setEffectiveWeight( 1 )
+              .fadeIn( 1 )
+              .setLoop(LoopOnce)
+              .play();
+            
         }
       } 
       else if(array[i].length == 1){
@@ -71,8 +83,10 @@ useGLTF.preload('/signLanguage.glb')
 
 function usePrevious(value) {
   const ref = useRef();
+  // let [val,setVal] = useState() 
   useEffect(() => {
     ref.current = value;
+    // setVal(value)
   }, [value]); 
   return ref.current;
 }
