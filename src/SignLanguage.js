@@ -1,92 +1,87 @@
-import React, { useRef,useEffect,useState } from 'react'
-import { useGLTF, useAnimations } from '@react-three/drei'
-import { LoopOnce } from 'three';
-import { Context } from './Context';
+import React, { useRef, useEffect, useContext } from "react";
+import { useGLTF, useAnimations } from "@react-three/drei";
+import { LoopOnce } from "three";
+import { Context } from "./Context";
 
 export default function Model({ ...props }) {
   
-  const {transcript,setAction,action} = props
-  const group = useRef()
-  const { nodes, materials, animations } = useGLTF('/signLanguage.glb')
-  const { actions } = useAnimations(animations, group)
-  let previousAction = usePrevious(action)
-  let array = transcript.split(" ")
-  array = array.map(x => {return x.toUpperCase()})
-  let activeAction
-  let prevAction
+  const { transcript, action, listening } = props;
+  const group = useRef();
+  const { nodes, materials, animations } = useGLTF("/signLanguage.glb");
+  const { actions } = useAnimations(animations, group);
+  let previousAction = usePrevious(action);
 
-  useEffect(() => {
+  let array = transcript.split(" ").map(x => x.toUpperCase());
+  const objKeys = Object.keys(actions);
+  let activeAction = actions['стоя'];
 
-    //trqbva da se napravi sas setAction trqbva da sravnq s loop kogato choveka kaje neshto da promenq setAction directno za da promenq samiq action 
-
-    const mainActions = Object.keys(actions)
-      for (let i = 0; i < array.length; i++) {
-        if(array[i].length > 1) {
+  if (!listening) {
+    for (let i = 0; i < array.length; i++) {
+      if (objKeys.includes(array[i])) {
         
-        let word = array[i].split('')
-          for (let t = 0; t < word.length; t++) {
+        previousAction = activeAction;
+        activeAction = actions[array[i]];
 
-              if(previousAction) {
-                // actions[previousAction]
-                  // .fadeOut(1)
-                  // .stop()
-                  actions[previousAction].fadeOut(1)
-              }
-              // actions[word[t]]
-              // .play()
-              // .setLoop(LoopOnce)      
-            actions[word[t]]
-              .setEffectiveTimeScale( 1 )
-              .setEffectiveWeight( 1 )
-              .fadeIn( 1 )
-              .setLoop(LoopOnce)
-              .play();
-            
+        if (previousAction !== activeAction) {
+          previousAction.fadeOut(2);
         }
-      } 
-      else if(array[i].length == 1){
-        if(previousAction) {
-          actions[previousAction]
-            .fadeOut(1)
-            .stop()
-        }
-        actions[action]
+
+        activeAction
+        .reset()
+        .setEffectiveTimeScale(1)
+        .setEffectiveWeight(1)
+        .fadeIn(2)
+        .play()
+        .setLoop(LoopOnce)
+        .clampWhenFinished = true;
+      } else {
+        for (let j = 0; j < array[i].length; j++) {
+          previousAction = activeAction;
+          activeAction = actions[array[i][j]];
+
+          if (previousAction !== activeAction) {
+            previousAction.fadeOut(2);
+          }
+
+          activeAction
+          .reset()
+          .setEffectiveTimeScale(1)
+          .setEffectiveWeight(1)
+          .fadeIn(2)
           .play()
           .setLoop(LoopOnce)
-          .fadeIn(1)
-          .clampWhenFinished = true
+          .clampWhenFinished = true;
+        }
       }
     }
-
-},[action,actions])
+  }
 
   return (
-    <Context.Provider value={actions}>
-    <group ref={group} {...props} dispose={null}>
-      <primitive object={nodes.Ctrl_Hand_IK_Left} />
-      <primitive object={nodes.Ctrl_ArmPole_IK_Right} />
-      <primitive object={nodes.Ctrl_Hand_IK_Right} />
-      <primitive object={nodes.mixamorigHips} />
-      <primitive object={nodes.Ctrl_Master} />
-      <primitive object={nodes.Ctrl_ArmPole_IK_Left} />
-      <primitive object={nodes.Ctrl_Foot_IK_Left} />
-      <primitive object={nodes.Ctrl_LegPole_IK_Left} />
-      <primitive object={nodes.Ctrl_Foot_IK_Right} />
-      <primitive object={nodes.Ctrl_LegPole_IK_Right} />
-      <skinnedMesh geometry={nodes.Ch03.geometry} material={materials.Ch03_Body} skeleton={nodes.Ch03.skeleton} />
-    </group>
+    <Context.Provider value={array}>
+      <group ref={group} {...props} dispose={null}>
+        <primitive object={ nodes.Ctrl_Hand_IK_Left } />
+        <primitive object={ nodes.Ctrl_ArmPole_IK_Right } />
+        <primitive object={ nodes.Ctrl_Hand_IK_Right } />
+        <primitive object={ nodes.mixamorigHips } />
+        <primitive object={ nodes.Ctrl_Master } />
+        <primitive object={ nodes.Ctrl_ArmPole_IK_Left } />
+        <primitive object={ nodes.Ctrl_Foot_IK_Left } />
+        <primitive object={ nodes.Ctrl_LegPole_IK_Left } />
+        <primitive object={ nodes.Ctrl_Foot_IK_Right } />
+        <primitive object={ nodes.Ctrl_LegPole_IK_Right } />
+        <skinnedMesh geometry={ nodes.Ch03.geometry } material={ materials.Ch03_Body } skeleton={ nodes.Ch03.skeleton } />
+      </group>
     </Context.Provider>
-  )
+  );
 }
 
-useGLTF.preload('/signLanguage.glb')
+useGLTF.preload("/signLanguage.glb");
 
-function usePrevious(value) {
+const usePrevious = (value) => {
   const ref = useRef();
-  // let [val,setVal] = useState() 
+
   useEffect(() => {
     ref.current = value;
-    // setVal(value)
   }, [value]); 
   return ref.current;
 }
