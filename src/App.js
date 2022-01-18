@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useContext } from 'react'
+import React, { Suspense, useState } from 'react'
 import { Canvas } from '@react-three/fiber' 
 import { OrbitControls } from '@react-three/drei' 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
